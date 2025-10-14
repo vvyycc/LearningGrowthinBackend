@@ -1,0 +1,17 @@
+{
+  "name": "learninggrowthin-backend",
+  "version": "1.0.0",
+  "description": "Herramientas para conectar smart contracts con el backend de LearningGrowthin",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo 'No hay pruebas automatizadas definidas'"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ethers": "^6.10.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
