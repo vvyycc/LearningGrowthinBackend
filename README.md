@@ -136,3 +136,30 @@ Puedes combinar estas funciones con `ClassScheduler` para automatizar la entrega
 
 - `npm test`: actualmente imprime un mensaje informativo. Agrega tus pruebas unitarias y actualiza este script según tus necesidades.
 - `npm run build`: compila los archivos TypeScript a la carpeta `dist/`.
+- `npm start`: ejecuta el servidor HTTP compilado desde `dist/server.js`.
+
+## Servidor HTTP y rutas disponibles
+
+El paquete incluye un servidor Express que expone rutas REST para consumir los servicios desde un frontend. Primero compila el proyecto y luego inicia el servidor:
+
+```bash
+npm run build
+npm start
+```
+
+El servidor escucha por defecto en el puerto `3000` (puede configurarse con la variable `PORT`) y expone las rutas bajo el prefijo `/api`:
+
+- `GET /api/health`: verificación rápida del estado del servicio.
+- `POST /api/classes`: programa una nueva clase (`scheduleClass`).
+- `PUT /api/classes/:classId`: actualiza una clase (`updateClass`).
+- `PATCH /api/classes/:classId/schedule`: reprograma una clase (`rescheduleClass`).
+- `POST /api/classes/:classId/enrollments`: inscribe a un estudiante (`enrollStudent`).
+- `GET /api/classes/:classId`: obtiene los detalles de una clase (`getClassDetails`).
+- `GET /api/classes/:classId/students`: lista estudiantes inscritos.
+- `POST /api/classes/:classId/distribute-rewards`: distribuye recompensas (`distributeRewards`).
+- `GET /api/learning-points/metadata`: recupera la metadata del token (`getTokenMetadata`).
+- `POST /api/learning-points/transfer`: transfiere puntos de aprendizaje (`transferLearningPoints`).
+- `POST /api/learning-points/mint`: emite nuevos puntos (`mintLearningPoints`).
+- `POST /api/learning-points/award`: asigna puntos a un estudiante (`awardLearningPoints`).
+
+Cada endpoint retorna respuestas JSON con la forma `{ success: boolean, data?: unknown, error?: { message: string } }`. Para operaciones de escritura se incluye el `txHash` asociado a la transacción.

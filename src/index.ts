@@ -6,3 +6,6 @@ export * from './services/contractRegistry';
 export * from './services/classSchedulerService';
 export * from './services/learningPointsTokenService';
 export * from './utils/abiLoader';
+export { createApp } from './server';
+export { default as apiRouter } from './routes';
+export { HttpError } from './routes/httpError';
