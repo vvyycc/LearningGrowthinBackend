@@ -8,6 +8,11 @@ export interface BlockchainEnvironmentConfig {
   chainId?: number;
 }
 
+export interface ContractAddressesConfig {
+  classScheduler?: string;
+  learningPointsToken?: string;
+}
+
 function readNumber(value: string | undefined): number | undefined {
   if (!value) return undefined;
   const parsed = Number(value);
@@ -26,5 +31,12 @@ export function loadBlockchainEnvironment(): BlockchainEnvironmentConfig {
     rpcUrl,
     privateKey: process.env.BLOCKCHAIN_PRIVATE_KEY || process.env.PRIVATE_KEY,
     chainId: readNumber(process.env.BLOCKCHAIN_CHAIN_ID || process.env.CHAIN_ID),
+  };
+}
+
+export function loadContractAddresses(): ContractAddressesConfig {
+  return {
+    classScheduler: process.env.CLASS_SCHEDULER_ADDRESS,
+    learningPointsToken: process.env.LEARNING_POINTS_TOKEN_ADDRESS,
   };
 }

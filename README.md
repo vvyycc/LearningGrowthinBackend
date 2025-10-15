@@ -18,11 +18,15 @@ Crea un archivo `.env` basado en el siguiente ejemplo o utiliza el archivo `.env
 BLOCKCHAIN_RPC_URL=https://sepolia.infura.io/v3/<tu-api-key>
 BLOCKCHAIN_PRIVATE_KEY=0x...
 BLOCKCHAIN_CHAIN_ID=11155111
+CLASS_SCHEDULER_ADDRESS=0x...
+LEARNING_POINTS_TOKEN_ADDRESS=0x...
 ```
 
 - `BLOCKCHAIN_RPC_URL`: URL del nodo RPC que utilizará el backend.
 - `BLOCKCHAIN_PRIVATE_KEY`: llave privada del *signer* que ejecutará transacciones.
 - `BLOCKCHAIN_CHAIN_ID` *(opcional)*: identificador de la red.
+- `CLASS_SCHEDULER_ADDRESS`: dirección del contrato `ClassScheduler.sol` desplegado.
+- `LEARNING_POINTS_TOKEN_ADDRESS`: dirección del contrato `LearningPointsToken.sol` desplegado.
 
 ## Funciones principales
 
@@ -31,6 +35,8 @@ BLOCKCHAIN_CHAIN_ID=11155111
 - `connectReadOnlyContract` y `connectSignerContract`: instancian contratos en modo lectura o con permisos de escritura.
 - `executeRead` y `executeWrite`: abstraen la ejecución de funciones de contrato y el manejo de recibos.
 - `registerContract`: mantiene un registro en memoria de contratos y sus parámetros de conexión.
+- `classSchedulerService`: funciones listas para programar clases, gestionar inscripciones y distribuir recompensas desde `ClassScheduler.sol`.
+- `learningPointsTokenService`: funciones de lectura y escritura sobre `LearningPointsToken.sol` incluyendo transferencias y emisión de puntos.
 
 La mayoría de las funciones aceptan parámetros opcionales como `rpcUrl`, `chainId`, `provider`, `signer` o `privateKey` para sobrescribir la configuración global cuando sea necesario.
 
@@ -73,6 +79,58 @@ run();
 Las funciones de `contractConnector` y `contractRegistry` permiten centralizar la lógica de conexión desde cualquier módulo del backend, evitando repetir configuración y facilitando pruebas.
 
 > También puedes publicar el paquete y consumirlo como dependencia desde otros repositorios importando directamente desde `learninggrowthin-backend`.
+
+## Integración con ClassScheduler.sol
+
+El servicio `classSchedulerService` utiliza automáticamente el ABI incluido en `src/contracts/ClassScheduler.json` y la dirección configurada en `CLASS_SCHEDULER_ADDRESS`. Desde cualquier módulo del backend puedes interactuar con el contrato utilizando funciones listas para las operaciones más comunes:
+
+```ts
+import {
+  scheduleClass,
+  rescheduleClass,
+  updateClass,
+  cancelClass,
+  enrollStudent,
+  setAttendance,
+  distributeRewards,
+  getClassDetails,
+  getEnrolledStudents,
+} from './src';
+
+await scheduleClass({
+  metadataURI: 'ipfs://class-metadata',
+  startTime: 1717804800n,
+  endTime: 1717808400n,
+  capacity: 25,
+  rewardAmount: 50,
+});
+
+const classInfo = await getClassDetails(1n);
+const students = await getEnrolledStudents(1n);
+await distributeRewards(1n);
+```
+
+Todas las funciones aceptan un objeto opcional de configuración para sobreescribir proveedor, signer o incluso un ABI y dirección alternativos cuando necesites trabajar con *forks* o entornos de prueba.
+
+## Integración con LearningPointsToken.sol
+
+El servicio `learningPointsTokenService` abstrae la interacción con el token de puntos de aprendizaje y utiliza el ABI disponible en `src/contracts/LearningPointsToken.json`. Permite consultar balances, configurar *allowances* y ejecutar transferencias o emisiones con funciones de alto nivel:
+
+```ts
+import {
+  getTokenMetadata,
+  getTokenBalance,
+  transferLearningPoints,
+  awardLearningPoints,
+} from './src';
+
+const metadata = await getTokenMetadata();
+const balance = await getTokenBalance('0xEstudiante');
+await transferLearningPoints('0xDocente', 10n);
+await awardLearningPoints('0xEstudiante', 15n);
+```
+
+Puedes combinar estas funciones con `ClassScheduler` para automatizar la entrega de recompensas al completar clases o registrar asistencias.
 
 ## Scripts disponibles
 
