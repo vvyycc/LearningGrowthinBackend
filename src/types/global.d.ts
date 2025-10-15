@@ -1,6 +1,7 @@
 declare const process: {
   env: Record<string, string | undefined>;
   cwd(): string;
+  argv: string[];
 };
 
 declare module 'dotenv' {
